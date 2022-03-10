@@ -1,0 +1,71 @@
+Ghilusi Corina-Adriana 323CD
+
+Clientul, pentru a putea interactiona cu server-ul, va citi comenzi de la stdin,
+atat timp cat nu este introdusa comanda "exit". In cazul introducerii comenzii "exit",
+se inchide programul.
+In requests.c se afla un numar de functii auxiliare ce formateaza request-uri ce sunt apoi
+trimise la server. Functiile sunt realizate dupa modelul laboratorului 10.
+Functia compute_post_request primeste ca parametri host-ul, o ruta, tipul payload-ului, un obiect de tip Json_value ce
+va permite serializarea obiectului in string si copierea sa in mesaj, un cookie si un JWT Token. Aceasta compune pe baza datelor primite ca
+parametri, un mesaj POST ce va fi trimis la server.
+Functia compute_get_request primeste un host, o ruta, parametri de query, un cookie si un JWT Token si compune un mesaj
+GET la ruta specificata.
+Functia compute_delete_request primeste un host, o ruta, tipul payload-ului, un cookie si un JWT Token si compune un mesaj
+DELETE la ruta specificata.
+
+Comanda "register" : se deschide conexiunea si se ofera prompt pentru username si parola,
+datele completandu-se de la tastatura. Cu aceste date, vom forma un obiect de tip json si vom
+crea un mesaj pe care il vom trimite server-ului cu ajutorul functiei compute_post_request.
+Vom verifica daca raspunsul returnat de server contine o eroare, caz in care vom semnala faptul ca username-ul nu
+este unul valid. Daca nu s-a primit un mesaj de eroare, inseamna ca inregistrarea noului cont s-a facut cu succes.
+In final, se inchide conexiunea.
+
+Comanda "login" : se deschide conexiunea si se ofera prompt pentru introducere username-ului si a parolei. Se creeaza
+un obiect json cu datele introduse de catre utilizator si se completeaza mesajul pentru server cu ajutorul
+compute_post_request. Mesajul se trimite la server si se verifica raspunsul returnat de catre acesta. Pot aparea doua
+tipuri de erori; un tip de eroare ce specifica faptul ca s-a introdus o parola gresita si un tip de eroare ce specifica
+faptul ca nu exista un cont inregistrat cu acel username. In ambele cazuri, vom afisa la tastatura linia
+"Eroare: Credentialele nu se potrivesc". Daca nu a fost returnat un mesaj de eroare, atunci afisam faptul ca autentificarea
+a fost realizata cu succes si cookie-ul de sesiune, pe care il extragem din raspunsul venit de la server. Vom salva
+acest cookie in variabila lastCookie. Existenta ei ne garanteaza accesul la librarie, aceasta demonstrand faptul
+ca autentificarea a fost realizata cu succes. In final, inchidem conexiunea.
+
+Comanda "enter_library" : se deschide conexiunea si se apeleaza functia compute_get_request ce returneaza mesajul pe
+care il trimitem la server. In cazul in care in raspuns se gaseste un mesaj de eroare, inseamna , in lipsa cookie-ului
+de sesiune, ca utlizatorul nu este autentificat. Vom afisa aceasta eroare. Daca nu s-a produs nicio eroare, atunci
+se extrage din raspuns token-ul JWT ce va fi retinut in variabila JWT_token si se afisa acesta, alaturi de un mesaj
+ce semnaleaza utilizatorului ca a intrat cu succes in librarie. In final, inchidem conexiunea.
+
+Comanda "get_books" : deschidem conexiunea si trimitem mesajul returnat de functia compute_get_message la server. Daca
+in raspunsul primit de la server intalnim un mesaj de eroare, inseamna ca utilizatorul nu a intrat cu succes in librarie
+si nu detine un token JWT. Astfel, returnam un mesaj ce semnaleaza utilizatorului faptul ca accesul sau la carti este
+nepermis. In cazul in care nu s-a gasit un mesaj de eroare in raspunsul de la server, vom afisa lista de carti. Inchidem
+conexiunea.
+
+Comanda "get_book" : deschidem conexiunea si afisam promptul de id ce va fi completat de user de la tastatura.
+Acest id va fi concatentat url-ului trimis functiei si apoi trimitem la server mesajul returnat de functia compute_get_request.
+Vom verifica daca au aparut erori in mesajul de la server, iar in caz afirmativ, vom afisa mesaje specifice fiecareia.
+In cazul in care utilizatorul nu a intrat cu succes in biblioteca, acesta nu va avea un token JWT valid, deci se va afisa
+un mesaj de acces nepermis. In cazul in care nu exista o carte cu id-ul introdus de utilizator, se va afisa acest lucru.
+Daca nu s-au returnat erori, atunci se va afisa cartea ceruta de catre utilizator. Inchidem conexiunea.
+
+Comanda "add_book": deschidem conexiunea si afisam prompt-uri pentru titlu, autor, gen, editura si numarul de pagini.
+Utilizatorul va completa aceste date si apoi se va construi un obiect de tip json cu acestea. Cu ajutorul functiei
+compute_post_request se va realiza mesajul ce va fi trimis la server. In cazul in care utilizatorul nu poate demonstra
+accesul pe baza unui token JWT,server-ul returneaza un mesaj de eroare si se va afisa faptul ca accesul este nepermis.
+In cazul in care in raspunsul de la server nu se gaseste niciun fel de eroare, se semnaleaza utilizatorului adaugarea
+cartii cu succes in librarie. Se inchide conexiunea.
+
+Comanda "delete_book" : deschidem conexiunea si afisam un prompt pentru id, pe care user-ul il completeaza si pe care
+il concatenam rutei trimise functiei compute_delete_request. Mesajul returnat de functie este trimis la server. In
+raspunsul de la server pot fi intalnite doua tipuri de mesaje de eroare; in cazul in care nu a fost demonstrata intrarea
+in librarie pe baza token-ului JWT, se va afisa un mesaj de acces nepermis, iar in cazul in care cartea cu id-ul tastat
+de user nu exista, atunci se va fisa un mesaj care sa indice acest lucru. Daca nu a aparut niciun mesaj de eroare, atunci
+se va afisa un mesaj care sa indice faptul ca stergerea cartii a fost realizata cu succes. In final, inchidem conexiunea.
+
+Comanda "logout" : deschidem conexiunea si trimitem la server mesajul returnat de functia compute_get_request. In cazul in
+care nu s-a putut demonstra accesul pe baza cookie-ului de sesiune, in raspunsul de la server se va afisa un mesaj de eroare
+pe care il afisam utlizatorului. In cazul in care nu s-a gasit un mesaj de eroare, semnalam utilizatorului faptul ca
+delogarea a fost realizata cu succes.
+
+
